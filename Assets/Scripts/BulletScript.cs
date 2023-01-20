@@ -6,7 +6,7 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour
 {
     Rigidbody2D bulletRigidbody2D;
-    Collider2D collider2D;
+    Collider2D myCollider2D;
 
     public float bulletSpeed = 10f;
     public float bulletLifeTime = 2f;
@@ -14,17 +14,17 @@ public class BulletScript : MonoBehaviour
     void Start()
     {
         bulletRigidbody2D = GetComponent<Rigidbody2D>();
-        collider2D        = GetComponent<Collider2D>();
+        myCollider2D        = GetComponent<Collider2D>();
     }
 
     void Update() { bulletRigidbody2D.AddForce(transform.right * bulletSpeed, ForceMode2D.Impulse); }
 
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (collider2D.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        if (myCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground")))
             bulletRigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
 
-        if (!collider2D.IsTouchingLayers(LayerMask.GetMask("Enemy"))) return;
+        if (!myCollider2D.IsTouchingLayers(LayerMask.GetMask("Enemy"))) return;
         Destroy(other.gameObject);
         Destroy(gameObject);
     }

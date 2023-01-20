@@ -12,8 +12,13 @@ public class Gun : MonoBehaviour
         Semi,
         Shotgun
     }
-
     FireMode currentFireMode;
+
+    public FireMode CurrentFireMode
+    {
+        get => currentFireMode;
+        set => currentFireMode = value;
+    }
 
     [Header("Configurable Parameters")]
     [SerializeField] GameObject bullet;
@@ -27,6 +32,9 @@ public class Gun : MonoBehaviour
     [SerializeField] Transform barrelExit;
     List<Quaternion> pellets;
 
+    float shootElapsedTime = 0;
+    [SerializeField] float shootDelay = 0.2f;
+
     [SerializeField] bool isSemi_Automatic;
     [SerializeField] bool isShotgun;
 
@@ -39,23 +47,18 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0)) Shoot(currentFireMode);
-    }
+        shootElapsedTime += Time.deltaTime;
 
-    #region MyRegion
-    // void AlternateShoot()
-    // {
-    //     int i=0;
-    //     foreach (Quaternion quat in pellets)
-    //     {
-    //         pellets[i] = Random.rotation;
-    //         GameObject p = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
-    //         p.transform.rotation = Quaternion.RotateTowards(p.transform.rotation, pellets[i], spreadAngle);
-    //         p.GetComponent<Rigidbody2D>().AddForce(p.transform.right * pelletFireVel);
-    //         i++;
-    //     }
-    // }
-    #endregion
+        if (Input.GetKeyDown(KeyCode.Mouse0) && shootElapsedTime >= shootDelay)
+        {
+            shootElapsedTime = 0;
+            Shoot(currentFireMode);
+        }
+
+        Debug.Log("Current Fire Mode: " + currentFireMode);
+
+        
+    }
 
     void Shoot(Enum fireMode)
     {
@@ -63,19 +66,18 @@ public class Gun : MonoBehaviour
         {
             case FireMode.Semi:
                 GameObject b = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
-                b.GetComponent<Rigidbody2D>().AddForce(b.transform.right * bulletScript.bulletSpeed);
+                b.GetComponent<Rigidbody2D>().AddForce(b.transform.forward * bulletScript.bulletSpeed);
                 Destroy(b, lifeTime);
+
                 break;
 
             case FireMode.Shotgun:
-                int i = 0;
-
-                foreach (Quaternion quat in pellets)
+                for (int i = 0; i < pelletCount; i++)
                 {
                     pellets[i] = Random.rotation;
                     GameObject p = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
                     p.transform.rotation = Quaternion.RotateTowards(p.transform.rotation, pellets[i], spreadAngle);
-                    p.GetComponent<Rigidbody2D>().AddForce(p.transform.right * pelletFireVel);
+                    p.GetComponent<Rigidbody2D>().AddForce(p.transform.forward * pelletFireVel);
                     i++;
                 }
 
