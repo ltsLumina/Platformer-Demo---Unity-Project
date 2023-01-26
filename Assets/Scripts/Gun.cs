@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
+using static UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
 public class Gun : MonoBehaviour
@@ -12,34 +12,46 @@ public class Gun : MonoBehaviour
         Semi,
         Shotgun
     }
-    FireMode currentFireMode;
 
-    public FireMode CurrentFireMode
-    {
-        get => currentFireMode;
-        set => currentFireMode = value;
-    }
+    public FireMode CurrentFireMode { get; set; }
 
-    [Header("Configurable Parameters")]
-    [SerializeField] GameObject bullet;
+    [Header("Serialized References")]
     [SerializeField] BulletScript bulletScript;
+    [SerializeField] GameObject collection;
+
+    [Header("Bullet Parameters")]
+    [SerializeField] GameObject bullet;
     [SerializeField] float lifeTime;
 
+    [Header("Shotgun Parameters")]
     [SerializeField] int pelletCount;
     [SerializeField] float spreadAngle;
     [SerializeField] float pelletFireVel;
+    [SerializeField] float shotgunDelay;
+
+    [Header("Object Serialization")]
     [SerializeField] GameObject pellet;
     [SerializeField] Transform barrelExit;
-    List<Quaternion> pellets;
 
-    float shootElapsedTime = 0;
     [SerializeField] float shootDelay = 0.2f;
+    [SerializeField] float knockbackForce;
 
-    [SerializeField] bool isSemi_Automatic;
-    [SerializeField] bool isShotgun;
+    [Header("Private Parameters")]
+    List<Quaternion> pellets;
+    List<GameObject> bulletList;
+    List<GameObject> pelletList;
+    float shootElapsedTime;
+
+    GameObject iBullet;
+    GameObject iPellet;
+
+    [Header("Cached References")]
+    Rigidbody2D player;
 
     void Awake()
     {
+        player = GetComponent<Rigidbody2D>();
+
         pellets = new List<Quaternion>(pelletCount);
 
         for (int i = 0; i < pelletCount; i++) { pellets.Add(Quaternion.Euler(Vector3.zero)); }
@@ -49,39 +61,55 @@ public class Gun : MonoBehaviour
     {
         shootElapsedTime += Time.deltaTime;
 
-        if (Input.GetKeyDown(KeyCode.Mouse0) && shootElapsedTime >= shootDelay)
-        {
-            shootElapsedTime = 0;
-            Shoot(currentFireMode);
-        }
+        if (!Input.GetKeyDown(KeyCode.Mouse0) || !(shootElapsedTime >= shootDelay)) return;
+        shootElapsedTime = 0;
+        Shoot(CurrentFireMode);
 
-        Debug.Log("Current Fire Mode: " + currentFireMode);
-
-        
+        if (!Input.GetKeyDown(KeyCode.Mouse1) || !(shootElapsedTime >= shootDelay)) return;
+        //TODO: Change firemode with right click.
     }
 
-    void Shoot(Enum fireMode)
+    /// <summary>
+    /// Method that controls shooting. Includes one parameter which determines in what way to fire the gun.
+    /// </summary>
+    /// <param name="fireMode">The shooting mode to use. Either Semi or Shotgun. </param>
+    /// <param name="iBullet">The gameobject that becomes instantiated.</param>
+    /// <param name="iPellet"> Same as above, but for the shotgun pellets. </param>
+    void Shoot(Enum fireMode) //TODO: Optimize to be an object pool.
     {
         switch (fireMode)
         {
             case FireMode.Semi:
-                GameObject b = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
-                b.GetComponent<Rigidbody2D>().AddForce(b.transform.forward * bulletScript.bulletSpeed);
-                Destroy(b, lifeTime);
+                iBullet = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
+                bulletList.Add(bullet);
+                iBullet.name = $"Bullet {bulletList.Count}";
+                transform.SetParent(gameObject.transform, collection.transform.GetChild(0).transform);
+
+                iBullet.GetComponent<Rigidbody2D>().AddForce(iBullet.transform.forward * bulletScript.bulletSpeed); //TODO: Optimize
 
                 break;
 
             case FireMode.Shotgun:
                 for (int i = 0; i < pelletCount; i++)
                 {
-                    pellets[i] = Random.rotation;
-                    GameObject p = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
-                    p.transform.rotation = Quaternion.RotateTowards(p.transform.rotation, pellets[i], spreadAngle);
-                    p.GetComponent<Rigidbody2D>().AddForce(p.transform.forward * pelletFireVel);
+                    shootElapsedTime = -shotgunDelay;
+                    pellets[i]       = Random.rotation;
+                    iPellet = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
+
+                    pelletList.Add(gameObject);
+                    iPellet.name = $"Pellet {pelletList.Count}";
+                    transform.SetParent(gameObject.transform, collection.transform.GetChild(1).transform);
+
+                    iPellet.transform.rotation = Quaternion.RotateTowards(iPellet.transform.rotation, pellets[i], spreadAngle);
+                    iPellet.GetComponent<Rigidbody2D>().AddForce(iPellet.transform.forward * pelletFireVel);
+
                     i++;
                 }
+                player.AddForce(-transform.right * knockbackForce, ForceMode2D.Impulse);
 
                 break;
         }
+        Destroy(iBullet, lifeTime);
+        Destroy(iPellet, lifeTime);
     }
 }
