@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build;
 using UnityEngine;
 using static UnityEngine.Debug;
 using Random = UnityEngine.Random;
@@ -38,7 +39,7 @@ public class Gun : MonoBehaviour
 
     [Header("Private Parameters")]
     List<Quaternion> pellets;
-    List<GameObject> bulletList;
+    [SerializeField] List<GameObject> bulletList;
     List<GameObject> pelletList;
     float shootElapsedTime;
 
@@ -81,10 +82,10 @@ public class Gun : MonoBehaviour
         {
             case FireMode.Semi:
                 iBullet = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
-                bulletList.Add(bullet);
+                bulletList.Add(iBullet);
                 iBullet.name = $"Bullet {bulletList.Count}";
-                transform.SetParent(gameObject.transform, collection.transform.GetChild(0).transform);
 
+                iBullet.transform.SetParent(collection.transform.GetChild(0).transform);
                 iBullet.GetComponent<Rigidbody2D>().AddForce(iBullet.transform.forward * bulletScript.bulletSpeed); //TODO: Optimize
 
                 break;
@@ -96,9 +97,9 @@ public class Gun : MonoBehaviour
                     pellets[i]       = Random.rotation;
                     iPellet = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
 
-                    pelletList.Add(gameObject);
+                    pelletList.Add(iPellet);
                     iPellet.name = $"Pellet {pelletList.Count}";
-                    transform.SetParent(gameObject.transform, collection.transform.GetChild(1).transform);
+                    iPellet.transform.SetParent(collection.transform.GetChild(1).transform); // Child number 1 = Pellet list.
 
                     iPellet.transform.rotation = Quaternion.RotateTowards(iPellet.transform.rotation, pellets[i], spreadAngle);
                     iPellet.GetComponent<Rigidbody2D>().AddForce(iPellet.transform.forward * pelletFireVel);
