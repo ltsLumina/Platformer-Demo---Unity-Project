@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 /// <summary>
 /// TODO: Add a description.
-/// TODO: bullets still only move to the right.
+///     TODO: bullets still only move to the right.
 /// TODO: make the gun aimable.
 /// Reminder: Game is based on time. Being able to use the shotgun knockback as a movement tool is very strong. Possible use for the gauge here. (i.e, shotgun can only be used when gauge is filled)
 /// </summary>
@@ -26,11 +26,13 @@ public class Gun : MonoBehaviour
 
     [Header("Serialized References"), Tooltip("These are the serialized references for the texts on screen.")]
     [SerializeField] BulletScript bulletScript; // [unused] The bullet script.
-    [SerializeField] GameObject collection; // [unused] The collection(gameobject) of which bullets and pellets should be childed to.
-    [SerializeField] TextMeshProUGUI fireModeText;   // [unused] The text that displays the current fire mode.
+    [SerializeField]
+    GameObject collection; // [unused] The collection(gameobject) of which bullets and pellets should be childed to.
+    [SerializeField] TextMeshProUGUI fireModeText; // [unused] The text that displays the current fire mode.
     [SerializeField] TextMeshProUGUI shootDelayText; // Displays when the player can shoot again.
 
-    [Header("Object Serialization"), Tooltip("These are the serialized objects for the pellet and position of the barrel exit.)")]
+    [Header("Object Serialization"),
+     Tooltip("These are the serialized objects for the pellet and position of the barrel exit.)")]
     [SerializeField] GameObject pellet;    // The pellet prefab.
     [SerializeField] Transform barrelExit; // The position of the barrel exit.
 
@@ -41,17 +43,23 @@ public class Gun : MonoBehaviour
     [SerializeField] float semiDelay = 0.2f; // How long it takes to shoot the SEMI again.
 
     [Header("Shotgun Parameters"), Tooltip("These are the parameters for the shotgun.")]
-    [SerializeField] int pelletCount;        // How many pellets are fired.
-    [SerializeField] float spreadAngle;      // How wide the spread is.
-    [SerializeField] float pelletFireVel;    // How fast the pellet is fired.
-    [SerializeField] float shotgunDelay;     // How long it takes to shoot the SHOTGUN again.
+    [SerializeField] int pelletCount;             // How many pellets are fired.
+    [SerializeField, Range(0, 8)] int minPellets; // The minimum amount of pellets that can be fired.
+    [SerializeField, Range(0, 8)] int maxPellets; // The maximum amount of pellets that can be fired.
+    [SerializeField] float spreadAngle;           // How wide the spread is.
+    [SerializeField] float pelletFireVel;         // How fast the pellet is fired.
+    [SerializeField] float shotgunDelay;          // How long it takes to shoot the SHOTGUN again.
 
     [Header("Knockback Related Parameters"), Tooltip("These are the parameters for knockback.")]
-    [SerializeField] float knockbackForce;   // How much knockback the pellet does.
-    [SerializeField] bool dealKnockback;     // Whether or not the shotgun deals knockback.
-    [SerializeField] float movingKbOffset;   // How much knockback the pellet does when the player is moving.
-    [SerializeField] float groundedKbOffset; // How much knockback the pellet does when the player is grounded.
-    [SerializeField] float airborneKbOffset; // How much knockback the pellet does when the player is airborne.
+    [SerializeField] float knockbackForce; // How much knockback the pellet does.
+    [SerializeField]
+    bool dealKnockback; // [Serialized for debugging purposes] Whether or not the shotgun deals knockback.
+    [SerializeField, Range(0, 50)]
+    float movingKbOffset; // How much knockback the pellet does when the player is moving.
+    [SerializeField, Range(0, 50)]
+    float groundedKbOffset; // How much knockback the pellet does when the player is grounded.
+    [SerializeField, Range(0, 50)]
+    float airborneKbOffset; // How much knockback the pellet does when the player is airborne.
 
     [Header("Private Parameters"), Space(25), Tooltip("These are the private parameters for the bullet and pellet.")]
     List<Quaternion> pellets; // The list of pellets.
@@ -64,8 +72,8 @@ public class Gun : MonoBehaviour
 
     [Header("Cached References")]
     Rigidbody2D player;    // The player's Rigidbody2D.
-    Rigidbody2D iBulletRb; // [unused] The instantiated bullet's Rigidbody2D. (Used for testing, didn't work)
-    Rigidbody2D iPelletRb; // [unused] The instantiated pellet's Rigidbody2D. (Used for testing, didn't work)
+    Rigidbody2D iBulletRb; // The instantiated bullet's Rigidbody2D.
+    Rigidbody2D iPelletRb; // The instantiated pellet's Rigidbody2D.
 
     [Header("Debugging"), Tooltip("This is only for debugging, do not touch.")]
     [SerializeField] bool debug;
@@ -89,18 +97,20 @@ public class Gun : MonoBehaviour
     void Update()
     {
         // Update the elapsed time each frame to determine when to shoot again.
-        shootElapsedTime    += Time.deltaTime;
-        shootDelayText.text =  $"Shoot Delay: {-shootElapsedTime:F2}"; // Displays the elapsed time. //TODO: Make this look better in game. i.e, make it countdown towards the next shot.
+        shootElapsedTime += Time.deltaTime;
 
-        if (shootElapsedTime >= semiDelay) shootDelayText.text = "Shoot Delay: {0:F2}";
+        shootDelayText.text =
+            $"Shoot Delay: {-shootElapsedTime:F2}"; // Displays the elapsed time. //TODO: Make this look better in game. i.e, make it countdown towards the next shot.
 
-        fireModeText.text   =  $"Fire Mode: {CurrentFireMode}";       // Displays the current fire mode.
+        if (shootElapsedTime >= semiDelay) shootDelayText.text = "Shoot Delay: 0";
+
+        fireModeText.text = $"Fire Mode: {CurrentFireMode}"; // Displays the current fire mode.
 
         // If the left mouse button is pressed and the elapsed time is greater than the shoot delay, shoot the gun.
         if (Input.GetKeyDown(KeyCode.Mouse0) && shootElapsedTime >= semiDelay)
         {
             shootElapsedTime = 0;
-            pelletCount      = Random.Range(3, 6);
+            pelletCount      = Random.Range(minPellets, maxPellets);
             Shoot(CurrentFireMode);
         }
 
@@ -123,10 +133,11 @@ public class Gun : MonoBehaviour
         switch (fireMode)
         {
             case FireMode.Semi:
-                dealKnockback    = false;
+                dealKnockback = false;
 
                 // Instantiate the bullet.
-                iBullet       = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
+                iBullet   = Instantiate(bullet, barrelExit.position, barrelExit.rotation);
+                iBulletRb = iBullet.GetComponent<Rigidbody2D>();
 
                 #region [archived/unused] Hierarchy organization
                 // bulletList.Add(iBullet);
@@ -134,26 +145,29 @@ public class Gun : MonoBehaviour
                 // iBullet.transform.SetParent(collection.transform.GetChild(0).transform);
                 #endregion
 
-                // Add force to the bullet.
-                iBullet.GetComponent<Rigidbody2D>().AddForce(iBullet.transform.right * bulletFireVel);                          //TODO: Optimize
+                iBulletRb.AddForce(iBullet.transform.right * bulletFireVel); //TODO: Optimize
 
                 break;
 
-            case FireMode.Shotgun:                                                                                                        //TODO: Rework the spread function.
+            case FireMode.Shotgun: //TODO: Rework the spread function.
                 for (int i = 0; i < pelletCount; i++)
                 {
                     // Reset the elapsed time, instantiate the pellet, and add force to the pellet.
                     shootElapsedTime = -shotgunDelay;
                     pellets[i]       = Random.rotation;
                     iPellet          = Instantiate(pellet, barrelExit.position, barrelExit.rotation);
+                    iPelletRb        = iPellet.GetComponent<Rigidbody2D>();
 
                     #region [archived/unused] Hierarchy organization
                     // pelletList.Add(iPellet);
                     // iPellet.name = $"Pellet {pelletList.Count}";
                     // iPellet.transform.SetParent(collection.transform.GetChild(1).transform); // Child number 1 = Pellet list.
                     #endregion
-                    iPellet.transform.rotation = Quaternion.RotateTowards(iPellet.transform.rotation, pellets[i], spreadAngle);
-                    iPellet.GetComponent<Rigidbody2D>().AddForce(iPellet.transform.right * pelletFireVel);                      // TODO: Optimize
+
+                    iPellet.transform.rotation =
+                        Quaternion.RotateTowards(iPellet.transform.rotation, pellets[i], spreadAngle);
+
+                    iPelletRb.AddForce(iPellet.transform.right * pelletFireVel); // TODO: Optimize
 
                     i++;
                     dealKnockback = true;
@@ -187,8 +201,7 @@ public class Gun : MonoBehaviour
                 player.AddForce(-transform.right * knockbackForce / movingKbOffset, ForceMode2D.Impulse);
                 ReleaseConstraints();
                 if (applyDebugging) LogWarning("Player is moving");
-
-                    break;
+                break;
 
             case true when player.velocity.y == 0:
                 player.AddForce(-transform.right * knockbackForce / groundedKbOffset, ForceMode2D.Impulse);

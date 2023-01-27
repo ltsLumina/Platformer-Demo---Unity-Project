@@ -473,7 +473,7 @@ public class PlayerMovement : MonoBehaviour
         float startTime = Time.time;
 
         _dashesLeft--;
-        _isDashAttacking = true;
+        _isDashAttacking = false;
 
         SetGravityScale(0);
 
