@@ -68,21 +68,21 @@ public class PlayerMovement : MonoBehaviour
                 LastOnGroundTime = Data.coyoteTime; //if so sets the lastGrounded to coyoteTime
             }
 
-            //Right Wall Check
-            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
-                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 !IsFacingRight) && !IsWallJumping)
-                LastOnWallRightTime = Data.coyoteTime;
+             //Right Wall Check
+             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
+                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  !IsFacingRight) && !IsWallJumping)
+                 LastOnWallRightTime = Data.coyoteTime;
 
-            //Right Wall Check
-            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 !IsFacingRight
-                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 IsFacingRight) && !IsWallJumping)
-                LastOnWallLeftTime = Data.coyoteTime;
+             //Right Wall Check
+             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  !IsFacingRight
+                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  IsFacingRight) && !IsWallJumping)
+                 LastOnWallLeftTime = Data.coyoteTime;
 
-            //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
-            LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
+             //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
+             LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
         }
         #endregion
 
@@ -91,19 +91,19 @@ public class PlayerMovement : MonoBehaviour
         {
             IsJumping = false;
 
-            if (!IsWallJumping)
-                _isJumpFalling = true;
+            // if (!IsWallJumping)
+            //     _isJumpFalling = true;
         }
 
-        if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
+        // if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
 
-        if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
-        {
-            _isJumpCut = false;
-
-            if (!IsJumping)
-                _isJumpFalling = false;
-        }
+        // if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
+        // {
+        //     _isJumpCut = false;
+        //
+        //     if (!IsJumping)
+        //         _isJumpFalling = false;
+        // }
 
         if (!IsDashing)
         {
@@ -118,19 +118,19 @@ public class PlayerMovement : MonoBehaviour
 
                 AnimHandler.startedJumping = true;
             }
-            //WALL JUMP
-            else if (CanWallJump() && LastPressedJumpTime > 0)
-            {
-                IsWallJumping  = true;
-                IsJumping      = false;
-                _isJumpCut     = false;
-                _isJumpFalling = false;
-
-                _wallJumpStartTime = Time.time;
-                _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
-
-                WallJump(_lastWallJumpDir);
-            }
+            // //WALL JUMP
+            // else if (CanWallJump() && LastPressedJumpTime > 0)
+            // {
+            //     IsWallJumping  = true;
+            //     IsJumping      = false;
+            //     _isJumpCut     = false;
+            //     _isJumpFalling = false;
+            //
+            //     _wallJumpStartTime = Time.time;
+            //     _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
+            //
+            //     WallJump(_lastWallJumpDir);
+            //}
         }
         #endregion
 
@@ -230,8 +230,8 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_groundCheckPoint.position, _groundCheckSize);
         Gizmos.color = Color.blue;
-        Gizmos.DrawWireCube(_frontWallCheckPoint.position, _wallCheckSize);
-        Gizmos.DrawWireCube(_backWallCheckPoint.position, _wallCheckSize);
+        // Gizmos.DrawWireCube(_frontWallCheckPoint.position, _wallCheckSize);
+        // Gizmos.DrawWireCube(_backWallCheckPoint.position, _wallCheckSize);
     }
     #endregion
 

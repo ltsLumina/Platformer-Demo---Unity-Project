@@ -15,7 +15,7 @@ public class Misc_DebugTools : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Backspace)) ReloadScene(0);
+        if (Input.GetKeyDown(KeyCode.Backspace)) ReloadScene(1);
     }
 
     public void SetFireMode(Gun.FireMode fireMode)

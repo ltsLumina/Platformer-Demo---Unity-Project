@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using static UnityEditor.EditorGUILayout;
-using static UnityEngine.GUILayout; //TODO: Why does this work/do what it does
+using static UnityEngine.GUILayout;
 
 [CustomEditor(typeof(Misc_DebugTools))]
 public class Misc_DebugToolsEditor : Editor
