@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+#region
 using UnityEditor;
-using UnityEngine;
-using static UnityEditor.EditorGUILayout;
 using static UnityEngine.GUILayout;
+#endregion
 
 [CustomEditor(typeof(Misc_DebugTools))]
 public class Misc_DebugToolsEditor : Editor
@@ -13,20 +11,20 @@ public class Misc_DebugToolsEditor : Editor
         DrawDefaultInspector();
 
         Misc_DebugTools misc_DebugTools = (Misc_DebugTools)target;
-        Gun gun = (Gun)FindObjectOfType(typeof(Gun)); //TODO: joel look i did it
+        Gun             gun             = (Gun)FindObjectOfType(typeof(Gun)); //TODO: joel look i did it
 
         Label("Debug Tools", EditorStyles.boldLabel);
 
-            GUILayout.Space(25);
+        Space(25);
 
         Label("Set Fire Mode", EditorStyles.boldLabel);
-        GUILayout.BeginHorizontal();
+        BeginHorizontal();
         if (Button("Semi")) misc_DebugTools.SetFireMode(Gun.FireMode.Semi);
         if (Button("Shotgun")) misc_DebugTools.SetFireMode(Gun.FireMode.Shotgun);
-        GUILayout.EndHorizontal();
+        EndHorizontal();
 
         Label($"Current Fire Mode: {gun.CurrentFireMode}", EditorStyles.miniBoldLabel);
 
-            GUILayout.Space(25);
+        Space(25);
     }
 }

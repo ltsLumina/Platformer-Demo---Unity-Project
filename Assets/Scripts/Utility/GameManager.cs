@@ -7,28 +7,24 @@ using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    PlayerData[] playerTypes;
-    [SerializeField]
-    Tilemap[] levels;
-    [SerializeField]
-    Transform spawnPoint;
+    [SerializeField] PlayerData[] playerTypes;
+    [SerializeField] Tilemap[] levels;
+    [SerializeField] Transform spawnPoint;
 
-    [SerializeField] [CanBeNull]
-    TextMeshProUGUI nameText;
+    [SerializeField] [CanBeNull] TextMeshProUGUI nameText;
 
     public SceneData SceneData;
-    Camera myCamera;
     Color currentForegroundColor;
 
     int currentPlayerTypeIndex;
     int currentTilemapIndex;
+    Camera myCamera;
     PlayerMovement player;
 
     void Awake()
     {
-        myCamera    = FindObjectOfType<Camera>();
-        player = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+        myCamera = FindObjectOfType<Camera>();
+        player   = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
     }
 
     void Start()
@@ -79,8 +75,8 @@ public class GameManager : MonoBehaviour
         SceneData = data;
 
         //Update the camera and tilemap color according to the new data.
-        myCamera.orthographicSize              = data.camSize;
-        myCamera.backgroundColor               = data.backgroundColor;
+        myCamera.orthographicSize         = data.camSize;
+        myCamera.backgroundColor          = data.backgroundColor;
         levels[currentTilemapIndex].color = data.foregroundColor;
 
         currentForegroundColor = data.foregroundColor;

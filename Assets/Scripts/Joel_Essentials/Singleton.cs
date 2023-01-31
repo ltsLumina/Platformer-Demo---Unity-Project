@@ -2,8 +2,7 @@
 using UnityEngine;
 #endregion
 
-[DefaultExecutionOrder(-2)]
-public class Singleton<T> : MonoBehaviour where T : Component
+[DefaultExecutionOrder(-2)] public class Singleton<T> : MonoBehaviour where T : Component
 {
     static T instance;
 

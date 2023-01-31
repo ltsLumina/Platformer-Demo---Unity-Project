@@ -1,7 +1,6 @@
 #region
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 #endregion
 
 public class PlayerMovement : MonoBehaviour
@@ -11,9 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public PlayerData Data;
 
     #region LAYERS & TAGS
-    [Header("Layers & Tags")]
-    [SerializeField]
-    LayerMask _groundLayer;
+    [Header("Layers & Tags")] [SerializeField] LayerMask _groundLayer;
     #endregion
 
     void Awake()
@@ -68,33 +65,28 @@ public class PlayerMovement : MonoBehaviour
                 LastOnGroundTime = Data.coyoteTime; //if so sets the lastGrounded to coyoteTime
             }
 
-             //Right Wall Check
-             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
-                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  !IsFacingRight) && !IsWallJumping)
-                 LastOnWallRightTime = Data.coyoteTime;
+            //Right Wall Check
+            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
+                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 !IsFacingRight) && !IsWallJumping)
+                LastOnWallRightTime = Data.coyoteTime;
 
-             //Right Wall Check
-             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  !IsFacingRight
-                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  IsFacingRight) && !IsWallJumping)
-                 LastOnWallLeftTime = Data.coyoteTime;
+            //Right Wall Check
+            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 !IsFacingRight
+                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 IsFacingRight) && !IsWallJumping)
+                LastOnWallLeftTime = Data.coyoteTime;
 
-             //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
-             LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
+            //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
+            LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
         }
         #endregion
 
         #region JUMP CHECKS
-        if (IsJumping && RB.velocity.y < 0)
-        {
-            IsJumping = false;
-
-            // if (!IsWallJumping)
-            //     _isJumpFalling = true;
-        }
-
+        if (IsJumping && RB.velocity.y < 0) IsJumping = false;
+        // if (!IsWallJumping)
+        //     _isJumpFalling = true;
         // if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
 
         // if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
@@ -106,7 +98,6 @@ public class PlayerMovement : MonoBehaviour
         // }
 
         if (!IsDashing)
-        {
             //Jump
             if (CanJump() && LastPressedJumpTime > 0)
             {
@@ -118,20 +109,20 @@ public class PlayerMovement : MonoBehaviour
 
                 AnimHandler.startedJumping = true;
             }
-            // //WALL JUMP
-            // else if (CanWallJump() && LastPressedJumpTime > 0)
-            // {
-            //     IsWallJumping  = true;
-            //     IsJumping      = false;
-            //     _isJumpCut     = false;
-            //     _isJumpFalling = false;
-            //
-            //     _wallJumpStartTime = Time.time;
-            //     _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
-            //
-            //     WallJump(_lastWallJumpDir);
-            //}
-        }
+
+        // //WALL JUMP
+        // else if (CanWallJump() && LastPressedJumpTime > 0)
+        // {
+        //     IsWallJumping  = true;
+        //     IsJumping      = false;
+        //     _isJumpCut     = false;
+        //     _isJumpFalling = false;
+        //
+        //     _wallJumpStartTime = Time.time;
+        //     _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
+        //
+        //     WallJump(_lastWallJumpDir);
+        //}
         #endregion
 
         #region DASH CHECKS
@@ -298,19 +289,12 @@ public class PlayerMovement : MonoBehaviour
 
     #region CHECK PARAMETERS
     //Set all of these up in the inspector
-    [Header("Checks")]
-    [SerializeField]
-    Transform _groundCheckPoint;
+    [Header("Checks")] [SerializeField] Transform _groundCheckPoint;
     //Size of groundCheck depends on the size of your character generally you want them slightly small than width (for ground) and height (for the wall check)
-    [SerializeField]
-    Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
-    [Space(5)]
-    [SerializeField]
-    Transform _frontWallCheckPoint;
-    [SerializeField]
-    Transform _backWallCheckPoint;
-    [SerializeField]
-    Vector2 _wallCheckSize = new Vector2(0.5f, 1f);
+    [SerializeField] Vector2 _groundCheckSize = new Vector2(0.49f, 0.03f);
+    [Space(5)] [SerializeField] Transform _frontWallCheckPoint;
+    [SerializeField] Transform _backWallCheckPoint;
+    [SerializeField] Vector2 _wallCheckSize = new Vector2(0.5f, 1f);
     #endregion
 
     #region INPUT CALLBACKS

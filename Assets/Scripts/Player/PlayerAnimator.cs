@@ -4,17 +4,11 @@ using UnityEngine;
 
 public class PlayerAnimator : MonoBehaviour
 {
-    [Header("Movement Tilt")]
-    [SerializeField]
-    float maxTilt;
-    [SerializeField] [Range(0, 1)]
-    float tiltSpeed;
+    [Header("Movement Tilt")] [SerializeField] float maxTilt;
+    [SerializeField] [Range(0, 1)] float tiltSpeed;
 
-    [Header("Particle FX")]
-    [SerializeField]
-    GameObject jumpFX;
-    [SerializeField]
-    GameObject landFX;
+    [Header("Particle FX")] [SerializeField] GameObject jumpFX;
+    [SerializeField] GameObject landFX;
 
     public float currentVelY;
     ParticleSystem _jumpParticle;

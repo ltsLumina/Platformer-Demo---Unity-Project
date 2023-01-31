@@ -2,13 +2,10 @@
 using UnityEngine;
 #endregion
 
-[CreateAssetMenu(menuName = "Scene Data")]
-public class SceneData : ScriptableObject
+[CreateAssetMenu(menuName = "Scene Data")] public class SceneData : ScriptableObject
 {
-    [Header("Camera")]
-    public float camSize;
+    [Header("Camera")] public float camSize;
 
-    [Header("Colors")]
-    public Color backgroundColor;
+    [Header("Colors")] public Color backgroundColor;
     public Color foregroundColor;
 }
