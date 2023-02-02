@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &69691793
 Transform:
   m_ObjectHideFlags: 0
@@ -151,9 +151,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1694807475}
-  - component: {fileID: 1694807476}
+  - component: {fileID: 787518607}
   m_Layer: 6
-  m_Name: Barrel Exit
+  m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -166,40 +166,47 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1694807474}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0.08715578, w: 0.9961947}
+  m_LocalPosition: {x: 0.63, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4152957062669869792}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &1694807476
-BoxCollider2D:
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10}
+--- !u!114 &787518607
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1694807474}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4302381f312213448a53fad79aa1c776, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collection: {fileID: 0}
+  fireModeText: {fileID: 0}
+  shootDelayText: {fileID: 0}
+  pellet: {fileID: 1728367215649439968, guid: edf7d14382bb56b4dbefb9122822b27d, type: 3}
+  barrelExit: {fileID: 1694807475}
+  bullet: {fileID: 1728367215649439968, guid: edf7d14382bb56b4dbefb9122822b27d, type: 3}
+  bulletFireVel: 1000
+  lifeTime: 10
+  semiDelay: 0.4
+  pelletCount: 5
+  minPellets: 5
+  maxPellets: 5
+  spread: 15
+  pelletFireVel: 1000
+  shotgunDelay: 0.5
+  knockbackForce: 100
+  dealKnockback: 0
+  movingKbOffset: 4
+  groundedKbOffset: 8
+  airborneKbOffset: 4
+  debug: 1
 --- !u!1 &4152957060709413394
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,10 +620,8 @@ GameObject:
   - component: {fileID: 4152957062669869792}
   - component: {fileID: 4152957062669869793}
   - component: {fileID: 4152957062669869798}
-  - component: {fileID: 1825444499}
   - component: {fileID: 4152957062669869799}
   - component: {fileID: 4152957062669869795}
-  - component: {fileID: 1825444505}
   m_Layer: 6
   m_Name: Player
   m_TagString: Player
@@ -691,32 +696,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &1825444499
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4152957062669869796}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4302381f312213448a53fad79aa1c776, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bulletScript: {fileID: 8418409391300995858, guid: edf7d14382bb56b4dbefb9122822b27d, type: 3}
-  collection: {fileID: 0}
-  bullet: {fileID: 1728367215649439968, guid: edf7d14382bb56b4dbefb9122822b27d, type: 3}
-  bulletSpeed: 10
-  lifeTime: 10
-  pelletCount: 10
-  spreadAngle: 10
-  pelletFireVel: 10
-  shotgunDelay: 0.5
-  pellet: {fileID: 1728367215649439968, guid: edf7d14382bb56b4dbefb9122822b27d, type: 3}
-  barrelExit: {fileID: 1694807475}
-  shootDelay: 0.55
-  knockbackForce: 100
-  bulletList: []
 --- !u!114 &4152957062669869799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -732,9 +711,9 @@ MonoBehaviour:
   Data: {fileID: 11400000, guid: 00d5f0210bb671246aa78857e25adfce, type: 2}
   _groundLayer:
     serializedVersion: 2
-    m_Bits: 384
+    m_Bits: 128
   _groundCheckPoint: {fileID: 4152957060847426910}
-  _groundCheckSize: {x: 0.49, y: 0.03}
+  _groundCheckSize: {x: 0.49, y: 0.06}
   _frontWallCheckPoint: {fileID: 4152957061355323822}
   _backWallCheckPoint: {fileID: 4152957061975579798}
   _wallCheckSize: {x: 0.5, y: 1}
@@ -755,16 +734,3 @@ MonoBehaviour:
   jumpFX: {fileID: 3234584074981126610, guid: ef64e6572022fbb47969c1618d73ef20, type: 3}
   landFX: {fileID: 3234584074981126610, guid: 0618e2f871341254cafc1ffc33fc18df, type: 3}
   currentVelY: 0
---- !u!114 &1825444505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4152957062669869796}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 620e7b9b03b14d74e868d6172b11a29c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 4152957062669869796}
