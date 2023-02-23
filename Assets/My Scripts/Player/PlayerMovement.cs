@@ -13,6 +13,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("Layers & Tags")] [SerializeField] LayerMask _groundLayer;
     #endregion
 
+    #region Rigidbody Max Speed
+    [Header("Rigidbody Configuration")] [SerializeField] float maxSpeed = 200f; //Replace with your max speed
+    #endregion
+
     void Awake()
     {
         RB          = GetComponent<Rigidbody2D>();
@@ -41,8 +45,7 @@ public class PlayerMovement : MonoBehaviour
         _moveInput.x = Input.GetAxisRaw("Horizontal");
         _moveInput.y = Input.GetAxisRaw("Vertical");
 
-        if (_moveInput.x != 0)
-            CheckDirectionToFace(_moveInput.x > 0);
+        if (_moveInput.x != 0) CheckDirectionToFace(_moveInput.x > 0);
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.C) || Input.GetKeyDown(KeyCode.J))
             OnJumpInput();
@@ -66,36 +69,36 @@ public class PlayerMovement : MonoBehaviour
             }
 
             //Right Wall Check
-            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
-                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 !IsFacingRight) && !IsWallJumping)
-                LastOnWallRightTime = Data.coyoteTime;
+             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
+                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  !IsFacingRight) && !IsWallJumping)
+                 LastOnWallRightTime = Data.coyoteTime;
 
-            //Right Wall Check
-            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 !IsFacingRight
-                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                 IsFacingRight) && !IsWallJumping)
-                LastOnWallLeftTime = Data.coyoteTime;
+             //Right Wall Check
+             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  !IsFacingRight
+                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                  IsFacingRight) && !IsWallJumping)
+                 LastOnWallLeftTime = Data.coyoteTime;
 
-            //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
-            LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
+             //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
+             LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
         }
         #endregion
 
         #region JUMP CHECKS
         if (IsJumping && RB.velocity.y < 0) IsJumping = false;
-        // if (!IsWallJumping)
-        //     _isJumpFalling = true;
-        // if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
+        if (!IsWallJumping)
+            _isJumpFalling = true;
+        if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
 
-        // if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
-        // {
-        //     _isJumpCut = false;
-        //
-        //     if (!IsJumping)
-        //         _isJumpFalling = false;
-        // }
+        if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
+        {
+            _isJumpCut = false;
+
+            if (!IsJumping)
+                _isJumpFalling = false;
+        }
 
         if (!IsDashing)
             //Jump
@@ -110,48 +113,48 @@ public class PlayerMovement : MonoBehaviour
                 AnimHandler.startedJumping = true;
             }
 
-        // //WALL JUMP
-        // else if (CanWallJump() && LastPressedJumpTime > 0)
-        // {
-        //     IsWallJumping  = true;
-        //     IsJumping      = false;
-        //     _isJumpCut     = false;
-        //     _isJumpFalling = false;
-        //
-        //     _wallJumpStartTime = Time.time;
-        //     _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
-        //
-        //     WallJump(_lastWallJumpDir);
-        //}
+            //WALL JUMP
+            else if (CanWallJump() && LastPressedJumpTime > 0)
+            {
+                IsWallJumping  = true;
+                IsJumping      = false;
+                _isJumpCut     = false;
+                _isJumpFalling = false;
+
+                _wallJumpStartTime = Time.time;
+                _lastWallJumpDir   = LastOnWallRightTime > 0 ? -1 : 1;
+
+                WallJump(_lastWallJumpDir);
+            }
         #endregion
 
         #region DASH CHECKS
-        if (CanDash() && LastPressedDashTime > 0)
-        {
-            //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
-            Sleep(Data.dashSleepTime);
-
-            //If not direction pressed, dash forward
-            if (_moveInput != Vector2.zero)
-                _lastDashDir = _moveInput;
-            else
-                _lastDashDir = IsFacingRight ? Vector2.right : Vector2.left;
-
-            IsDashing     = true;
-            IsJumping     = false;
-            IsWallJumping = false;
-            _isJumpCut    = false;
-
-            StartCoroutine(nameof(StartDash), _lastDashDir);
-        }
+        // if (CanDash() && LastPressedDashTime > 0)
+        // {
+        //     //Freeze game for split second. Adds juiciness and a bit of forgiveness over directional input
+        //     Sleep(Data.dashSleepTime);
+        //
+        //     //If not direction pressed, dash forward
+        //     if (_moveInput != Vector2.zero)
+        //         _lastDashDir = _moveInput;
+        //     else
+        //         _lastDashDir = IsFacingRight ? Vector2.right : Vector2.left;
+        //
+        //     IsDashing     = true;
+        //     IsJumping     = false;
+        //     IsWallJumping = false;
+        //     _isJumpCut    = false;
+        //
+        //     StartCoroutine(nameof(StartDash), _lastDashDir);
+        // }
         #endregion
 
         #region SLIDE CHECKS
-        if (CanSlide() &&
-            (LastOnWallLeftTime > 0 && _moveInput.x < 0 || LastOnWallRightTime > 0 && _moveInput.x > 0))
-            IsSliding = true;
-        else
-            IsSliding = false;
+        // if (CanSlide() &&
+        //     (LastOnWallLeftTime > 0 && _moveInput.x < 0 || LastOnWallRightTime > 0 && _moveInput.x > 0))
+        //     IsSliding = true;
+        // else
+        //     IsSliding = false;
         #endregion
 
         #region GRAVITY
@@ -200,6 +203,11 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(RB.velocity.magnitude > maxSpeed)
+        {
+            RB.velocity = RB.velocity.normalized * maxSpeed;
+        }
+
         //Handle Run
         if (!IsDashing)
         {
@@ -221,8 +229,8 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(_groundCheckPoint.position, _groundCheckSize);
         Gizmos.color = Color.blue;
-        // Gizmos.DrawWireCube(_frontWallCheckPoint.position, _wallCheckSize);
-        // Gizmos.DrawWireCube(_backWallCheckPoint.position, _wallCheckSize);
+        Gizmos.DrawWireCube(_frontWallCheckPoint.position, _wallCheckSize);
+        Gizmos.DrawWireCube(_backWallCheckPoint.position, _wallCheckSize);
     }
     #endregion
 
@@ -253,7 +261,14 @@ public class PlayerMovement : MonoBehaviour
     //Variables control the various actions the player can perform at any time.
     //These are fields which can are public allowing for other scripts to read them
     //but can only be privately written to.
-    public bool IsFacingRight { get; private set; }
+
+    bool isFacingRight;
+    public bool IsFacingRight
+    {
+        get => isFacingRight;
+        private set => isFacingRight = value /*Debug.Log($"IsFacing Right: {IsFacingRight}");*/;
+    }
+
     public bool IsJumping { get; private set; }
     public bool IsWallJumping { get; private set; }
     public bool IsDashing { get; private set; }
@@ -386,14 +401,63 @@ public class PlayerMovement : MonoBehaviour
         */
     }
 
-    void Turn()
+    // public void SpeedlinesAdjustment()
+    // {
+    //     switch (RB.velocity.x)
+    //     {
+    //         case > 30:
+    //             AdjustLineSpeed(emissionRate);
+    //             break;
+    //
+    //         case < -30:
+    //             AdjustLineSpeed(-emissionRate);
+    //             break;
+    //
+    //         case < 30:
+    //             ResetLineSpeed();
+    //             break;
+    //     }
+    // }
+    //
+    // void AdjustLineSpeed(float acceleration)
+    // {
+    //     ParticleSystem.EmissionModule emissionMod = speedLine.emission;
+    //     emissionMod.rateOverTime = acceleration;
+    // }
+    //
+    // void ResetLineSpeed()
+    // {
+    //     ParticleSystem.EmissionModule emissionMod = speedLine.emission;
+    //     emissionMod.rateOverTime = 0;
+    // }
+
+    private void PlayerFlip() // Flip method only to be used in this script. For external use use Flip(Vector2 flipDirection).
     {
-        //stores scale and flips the player along the x axis,
         Vector3 scale = transform.localScale;
         scale.x              *= -1;
-        transform.localScale =  scale;
+        transform.localScale = scale;
 
         IsFacingRight = !IsFacingRight;
+    }
+
+    public void Flip(Vector2 flipDirection)
+    {
+        if (flipDirection == Vector2.right)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x              = 1;
+            transform.localScale = scale;
+
+            IsFacingRight = true;
+        }
+        else if (flipDirection == Vector2.left)
+        {
+            Vector3 scale = transform.localScale;
+            scale.x              = -1;
+            transform.localScale = scale;
+
+            IsFacingRight = false;
+        }
     }
     #endregion
 
@@ -499,20 +563,17 @@ public class PlayerMovement : MonoBehaviour
     public void CheckDirectionToFace(bool isMovingRight)
     {
         if (isMovingRight != IsFacingRight)
-            Turn();
+        PlayerFlip();
     }
 
-    bool CanJump() { return LastOnGroundTime > 0 && !IsJumping; }
+    bool CanJump() => LastOnGroundTime > 0 && !IsJumping;
 
-    bool CanWallJump()
-    {
-        return LastPressedJumpTime > 0 && LastOnWallTime > 0 && LastOnGroundTime <= 0 && (!IsWallJumping ||
-            LastOnWallRightTime > 0 && _lastWallJumpDir == 1 || LastOnWallLeftTime > 0 && _lastWallJumpDir == -1);
-    }
+    bool CanWallJump() => LastPressedJumpTime > 0 && LastOnWallTime > 0 && LastOnGroundTime <= 0 && (!IsWallJumping ||
+        LastOnWallRightTime > 0 && _lastWallJumpDir == 1 || LastOnWallLeftTime > 0 && _lastWallJumpDir == -1);
 
-    bool CanJumpCut() { return IsJumping && RB.velocity.y > 0; }
+    bool CanJumpCut() => IsJumping && RB.velocity.y > 0;
 
-    bool CanWallJumpCut() { return IsWallJumping && RB.velocity.y > 0; }
+    bool CanWallJumpCut() => IsWallJumping && RB.velocity.y > 0;
 
     bool CanDash()
     {
@@ -522,12 +583,6 @@ public class PlayerMovement : MonoBehaviour
         return _dashesLeft > 0;
     }
 
-    public bool CanSlide()
-    {
-        if (LastOnWallTime > 0 && !IsJumping && !IsWallJumping && !IsDashing && LastOnGroundTime <= 0)
-            return true;
-
-        return false;
-    }
+    //public bool CanSlide() => LastOnWallTime > 0 && !IsJumping && !IsWallJumping && !IsDashing && LastOnGroundTime <= 0;
     #endregion
 }

@@ -1,5 +1,7 @@
 #region
+using System;
 using UnityEngine;
+using static UnityEngine.Debug;
 #endregion
 
 [RequireComponent(typeof(Camera))]
@@ -12,6 +14,7 @@ public class CameraScript : MonoBehaviour
 
     //Private variables
     Vector3 velocity = Vector3.zero;
+    Vector3 targetPosition;
 
     void Start()
     {
@@ -20,8 +23,15 @@ public class CameraScript : MonoBehaviour
 
     void LateUpdate()
     {
-        Vector3 targetPosition =
-            new Vector3(targetToFollow.position.x + xOffset, targetToFollow.position.y + yOffset, transform.position.z);
+        try
+        {
+            targetPosition =
+                new Vector3(targetToFollow.position.x + xOffset, targetToFollow.position.y + yOffset,
+                            transform.position.z);
+        } catch (MissingReferenceException exception)
+        {
+            throw new Exception($"Error Detected! {exception}");
+        }
 
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothing);
     }

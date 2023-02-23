@@ -45,7 +45,7 @@ public class PlayerAnimator : MonoBehaviour
         else
         {
             tiltProgress = Mathf.InverseLerp(-mov.Data.runMaxSpeed, mov.Data.runMaxSpeed, mov.RB.velocity.x);
-            mult         = mov.IsFacingRight ? 1 : -1;
+            //mult         = mov.IsFacingRight ? 1 : -1;
         }
 
         float newRot = tiltProgress * maxTilt * 2 - maxTilt;

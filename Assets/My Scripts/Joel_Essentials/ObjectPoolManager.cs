@@ -9,7 +9,7 @@ public class ObjectPoolManager : Singleton<ObjectPoolManager>
     List<ObjectPool> objectPools = new List<ObjectPool>();
 
     /// <summary>
-    ///     Gets the premade object pools and adds them to the list of object pools.
+    ///     Gets the pre-made object pools and adds them to the list of object pools.
     /// </summary>
     void Start()
     {
@@ -41,10 +41,8 @@ public class ObjectPoolManager : Singleton<ObjectPoolManager>
     /// <returns></returns>
     public ObjectPool GetObjectPoolBasedOnPrefab(GameObject objectPrefab)
     {
-        foreach (ObjectPool objectPool in objectPools)
-        {
-            if (objectPool.GetPooledObjectPrefab() == objectPrefab) return objectPool;
-        }
+        foreach (ObjectPool objectPool in objectPools.Where(objectPool => objectPool.GetPooledObjectPrefab() == objectPrefab))
+            return objectPool;
 
         Debug.LogWarning("That object is NOT yet pooled! Creating a new pool...");
         return CreateNewPool(objectPrefab, 1);
