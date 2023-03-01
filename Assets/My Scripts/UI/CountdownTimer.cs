@@ -1,30 +1,31 @@
-using System.Collections;
-using System.Collections.Generic;
+#region
+using System;
 using TMPro;
 using UnityEngine;
+#endregion
 
 public class CountdownTimer : MonoBehaviour
 {
     [SerializeField] float timeValue = 90f;
     [SerializeField] float startTime = 90f;
-    public float TimeValue { get; set; }
-
     [SerializeField] float maxTimeValue;
     [SerializeField] TextMeshProUGUI timerText;
     [SerializeField] bool countUp;
 
     bool countDirectionLastFrame;
-    PlayerMovement player;
-    Pickups pickups;
 
     SceneLoader loader;
+    Pickup pickup;
+    PlayerMovement player;
+
+    public float TimeValue { get; set; }
 
     void Start()
     {
         countDirectionLastFrame = !countUp;
         timeValue               = startTime;
         player                  = FindObjectOfType<PlayerMovement>();
-        pickups                 = FindObjectOfType<Pickups>();
+        pickup                  = FindObjectOfType<Pickup>();
         loader                  = FindObjectOfType<SceneLoader>();
     }
 
@@ -38,10 +39,8 @@ public class CountdownTimer : MonoBehaviour
     void Count()
     {
         if (countUp != countDirectionLastFrame)
-        {
             //timeValue = countUp ? 0 : maxTimeValue;
             countDirectionLastFrame = countUp;
-        }
 
         timeValue += (countUp ? 1 : -1) * Time.deltaTime;
 
@@ -58,10 +57,7 @@ public class CountdownTimer : MonoBehaviour
         timerText.text = $"{minutes:00}:{seconds:00}";
     }
 
-    public void AddTime(float timeToAdd)
-    {
-        timeValue += timeToAdd;
-    }
+    public void AddTime(float timeToAdd) { timeValue += timeToAdd; }
 
     void StopCountdown()
     {
@@ -73,6 +69,13 @@ public class CountdownTimer : MonoBehaviour
         Destroy(player);
         Debug.Log("Player Died!!");
 
-        loader.LoadGameOver(loader.DelayInSeconds);
+        try
+        {
+            loader.LoadGameOver(loader.DelayInSeconds);
+        } catch (Exception error)
+        {
+            Debug.LogError("Error: " + error.Message + "\n There is no end-scene scene in the build settings.");
+            throw;
+        }
     }
 }

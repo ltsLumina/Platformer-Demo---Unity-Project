@@ -9,7 +9,7 @@ public class ObjectPool : MonoBehaviour
     [SerializeField] GameObject objectPrefab;
     [SerializeField] int startAmount;
 
-    readonly List<GameObject> pooledObjects = new();
+    readonly List<GameObject> pooledObjects = new List<GameObject>();
 
     void Start() => InstantiateStartAmount();
 
@@ -59,7 +59,9 @@ public class ObjectPool : MonoBehaviour
 
         // Alternatively, using a LINQ-expression.
         foreach (GameObject pooledObject in pooledObjects.Where(pooledObject => !pooledObject.activeInHierarchy))
+        {
             objectToReturn = pooledObject;
+        }
 
         if (objectToReturn == null) objectToReturn = CreatePooledObject();
 

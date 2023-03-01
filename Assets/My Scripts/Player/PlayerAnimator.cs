@@ -10,6 +10,15 @@ public class PlayerAnimator : MonoBehaviour
     [Header("Particle FX")] [SerializeField] GameObject jumpFX;
     [SerializeField] GameObject landFX;
 
+    [Header("Cached References")]
+    Animator tomteAnimator;
+
+    public Animator TomteAnimator
+    {
+        get => tomteAnimator;
+        set => tomteAnimator = value;
+    }
+
     public float currentVelY;
     ParticleSystem _jumpParticle;
     ParticleSystem _landParticle;
@@ -41,13 +50,10 @@ public class PlayerAnimator : MonoBehaviour
 
         int mult = -1;
 
-        if (mov.IsSliding) { tiltProgress = 0.25f; }
-        else
-        {
-            tiltProgress = Mathf.InverseLerp(-mov.Data.runMaxSpeed, mov.Data.runMaxSpeed, mov.RB.velocity.x);
-            //mult         = mov.IsFacingRight ? 1 : -1;
-        }
+        if (mov.IsSliding) tiltProgress = 0.25f;
+        else tiltProgress = Mathf.InverseLerp(-mov.Data.runMaxSpeed, mov.Data.runMaxSpeed, mov.RB.velocity.x);
 
+        //mult         = mov.IsFacingRight ? 1 : -1;
         float newRot = tiltProgress * maxTilt * 2 - maxTilt;
         float rot    = Mathf.LerpAngle(spriteRend.transform.localRotation.eulerAngles.z * mult, newRot, tiltSpeed);
         spriteRend.transform.localRotation = Quaternion.Euler(0, 0, rot * mult);
@@ -77,7 +83,7 @@ public class PlayerAnimator : MonoBehaviour
 
         if (justLanded)
         {
-            anim.SetTrigger("Land");
+            //anim.SetTrigger("Land");
 
             GameObject obj = Instantiate(landFX, transform.position - Vector3.up * transform.localScale.y / 1.5f,
                                          Quaternion.Euler(-90, 0, 0));
@@ -87,6 +93,6 @@ public class PlayerAnimator : MonoBehaviour
             return;
         }
 
-        anim.SetFloat("Vel Y", mov.RB.velocity.y);
+        //anim.SetFloat("Vel Y", mov.RB.velocity.y);
     }
 }

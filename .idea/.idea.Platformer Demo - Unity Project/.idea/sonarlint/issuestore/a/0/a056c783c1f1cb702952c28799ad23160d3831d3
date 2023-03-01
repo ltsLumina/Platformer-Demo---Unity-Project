@@ -1,0 +1,9 @@
+
+tcsharpsquid:S3776 "RRefactor this method to reduce its Cognitive Complexity from 61 to the 15 allowed.(®±®“üÿÿÿÿ
+acsharpsquid:S1104
+"DMake this field 'private' and encapsulate it in a 'public' property.(ü£ã
+Pcsharpsquid:S1172§"-Remove this unused method parameter 'amount'.(±µµßşÿÿÿÿ
+;csharpsquid:S125‹"Remove this commented out code.(Š›Ñ)
+Acsharpsquid:S125"Remove this commented out code.(Õ«øÿÿÿÿ
+<csharpsquid:S125”"Remove this commented out code.(Ú°à¬
+Acsharpsquid:S125É"Remove this commented out code.(øİÆûÿÿÿÿ

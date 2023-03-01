@@ -10,17 +10,26 @@ public class PlayerMovement : MonoBehaviour
     public PlayerData Data;
 
     #region LAYERS & TAGS
-    [Header("Layers & Tags")] [SerializeField] LayerMask _groundLayer;
+    [Header("Layers & Tags")]
+    [SerializeField] LayerMask _groundLayer;
     #endregion
 
     #region Rigidbody Max Speed
-    [Header("Rigidbody Configuration")] [SerializeField] float maxSpeed = 200f; //Replace with your max speed
+    [Header("Rigidbody Configuration")]
+    [SerializeField] float maxSpeed = 45f; //Replace with your max speed
+    #endregion
+
+    #region Animator
+    [Header("Animator")]
+    [SerializeField] Animator tomteAnimator;
+    bool isGrounded;
+
     #endregion
 
     void Awake()
     {
-        RB          = GetComponent<Rigidbody2D>();
-        AnimHandler = GetComponent<PlayerAnimator>();
+        RB            = GetComponent<Rigidbody2D>();
+        AnimHandler   = GetComponent<PlayerAnimator>();
     }
 
     void Start()
@@ -31,6 +40,41 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        #region ANIMATION
+        //if (RB.velocity.x == 0) tomteAnimator.Play("idle");
+
+        if (RB.velocity.x != 0)
+        {
+            tomteAnimator.SetBool(IsRunning, RB.velocity.x is > 3 or < -3);
+            tomteAnimator.speed = Mathf.Abs(RB.velocity.x / 25);
+        }
+        else
+        {
+            tomteAnimator.SetBool(IsRunning, false);
+            tomteAnimator.speed = 1;
+        }
+
+        if (RB.velocity.y > 0)
+        {
+            tomteAnimator.SetBool("isFalling", false);
+            tomteAnimator.SetBool("isJumping", true);
+        }
+        else if (RB.velocity.y < 0)
+        {
+            tomteAnimator.SetBool("isJumping", false);
+            tomteAnimator.SetBool("isFalling", true);
+        }
+        #endregion
+
+        #region VELOCITY FIX
+        if (RB.velocity.x is > 0 and < 1.7f) RB.velocity  = new Vector2(0, RB.velocity.y);
+        if (RB.velocity.x is < 0 and > -1.7f) RB.velocity = new Vector2(0, RB.velocity.y);
+
+        if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer) &&
+            !IsJumping) //checks if set box overlaps with ground
+            RB.velocity = new Vector2(RB.velocity.x, 0);
+        #endregion
+
         #region TIMERS
         LastOnGroundTime    -= Time.deltaTime;
         LastOnWallTime      -= Time.deltaTime;
@@ -64,32 +108,35 @@ public class PlayerMovement : MonoBehaviour
                 !IsJumping) //checks if set box overlaps with ground
             {
                 if (LastOnGroundTime < -0.1f) AnimHandler.justLanded = true;
-
                 LastOnGroundTime = Data.coyoteTime; //if so sets the lastGrounded to coyoteTime
             }
 
+            isGrounded = Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer);
+
             //Right Wall Check
-             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
-                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  !IsFacingRight) && !IsWallJumping)
-                 LastOnWallRightTime = Data.coyoteTime;
+            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
+                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 !IsFacingRight) && !IsWallJumping)
+                LastOnWallRightTime = Data.coyoteTime;
 
-             //Right Wall Check
-             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  !IsFacingRight
-                  || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
-                  IsFacingRight) && !IsWallJumping)
-                 LastOnWallLeftTime = Data.coyoteTime;
+            //Right Wall Check
+            if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 !IsFacingRight
+                 || Physics2D.OverlapBox(_backWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) &&
+                 IsFacingRight) && !IsWallJumping)
+                LastOnWallLeftTime = Data.coyoteTime;
 
-             //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
-             LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
+            //Two checks needed for both left and right walls since whenever the play turns the wall checkPoints swap sides
+            LastOnWallTime = Mathf.Max(LastOnWallLeftTime, LastOnWallRightTime);
         }
         #endregion
 
         #region JUMP CHECKS
         if (IsJumping && RB.velocity.y < 0) IsJumping = false;
+
         if (!IsWallJumping)
             _isJumpFalling = true;
+
         if (IsWallJumping && Time.time - _wallJumpStartTime > Data.wallJumpTime) IsWallJumping = false;
 
         if (LastOnGroundTime > 0 && !IsJumping && !IsWallJumping)
@@ -203,10 +250,7 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(RB.velocity.magnitude > maxSpeed)
-        {
-            RB.velocity = RB.velocity.normalized * maxSpeed;
-        }
+        if (RB.velocity.magnitude > maxSpeed) RB.velocity = RB.velocity.normalized * maxSpeed;
 
         //Handle Run
         if (!IsDashing)
@@ -262,12 +306,7 @@ public class PlayerMovement : MonoBehaviour
     //These are fields which can are public allowing for other scripts to read them
     //but can only be privately written to.
 
-    bool isFacingRight;
-    public bool IsFacingRight
-    {
-        get => isFacingRight;
-        private set => isFacingRight = value /*Debug.Log($"IsFacing Right: {IsFacingRight}");*/;
-    }
+    public bool IsFacingRight { get; private set; }
 
     public bool IsJumping { get; private set; }
     public bool IsWallJumping { get; private set; }
@@ -310,11 +349,13 @@ public class PlayerMovement : MonoBehaviour
     [Space(5)] [SerializeField] Transform _frontWallCheckPoint;
     [SerializeField] Transform _backWallCheckPoint;
     [SerializeField] Vector2 _wallCheckSize = new Vector2(0.5f, 1f);
+    readonly static int IsRunning = Animator.StringToHash("isRunning");
+    readonly static int Jumping = Animator.StringToHash("isJumping");
     #endregion
 
     #region INPUT CALLBACKS
     //Methods which handles input detected in Update()
-    public void OnJumpInput() { LastPressedJumpTime = Data.jumpInputBufferTime; }
+    public void OnJumpInput() => LastPressedJumpTime = Data.jumpInputBufferTime;
 
     public void OnJumpUpInput()
     {
@@ -431,11 +472,11 @@ public class PlayerMovement : MonoBehaviour
     //     emissionMod.rateOverTime = 0;
     // }
 
-    private void PlayerFlip() // Flip method only to be used in this script. For external use use Flip(Vector2 flipDirection).
+    void PlayerFlip() // Flip method only to be used in this script. For external use use Flip(Vector2 flipDirection).
     {
         Vector3 scale = transform.localScale;
         scale.x              *= -1;
-        transform.localScale = scale;
+        transform.localScale =  scale;
 
         IsFacingRight = !IsFacingRight;
     }
@@ -462,7 +503,7 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region JUMP METHODS
-    void Jump()
+    public void Jump()
     {
         //Ensures we can't call Jump multiple times from one press
         LastPressedJumpTime = 0;
@@ -563,7 +604,7 @@ public class PlayerMovement : MonoBehaviour
     public void CheckDirectionToFace(bool isMovingRight)
     {
         if (isMovingRight != IsFacingRight)
-        PlayerFlip();
+            PlayerFlip();
     }
 
     bool CanJump() => LastOnGroundTime > 0 && !IsJumping;

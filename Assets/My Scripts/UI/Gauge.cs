@@ -1,43 +1,37 @@
 #region
-using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.Debug;
 #endregion
 
-[ExecuteInEditMode]
-public class Gauge : MonoBehaviour
+[ExecuteInEditMode] public class Gauge : MonoBehaviour
 {
     [Header("Gauge Settings")]
     [Tooltip("The maximum value of the gauge. \n The current gauge slider will clamp to this value.")]
-    [SerializeField, Range(0, 100)] float maxGauge;
-    [HideInInspector, Range(0, 100)] float currentGauge;
-    
-    public float CurrentGauge
-    {
-        get => currentGauge;
-        set => currentGauge = value;
-    }
+    [SerializeField]
+    [Range(0, 100)]
+    float maxGauge;
+
+    [Header("Cached References")] Slider gaugeSlider;
+
+    [field: HideInInspector] [field: Range(0, 100)] public float CurrentGauge { get; set; }
+
     public float MaxGauge
     {
         get => maxGauge;
         set => maxGauge = value;
     }
 
-    [Header("Cached References")]
-    Slider gaugeSlider;
-
     void Start()
     {
         gaugeSlider  = GetComponent<Slider>();
         maxGauge     = 100;
-        currentGauge = 0;
+        CurrentGauge = 0;
     }
 
     void Update()
     {
-        gaugeSlider.value    = currentGauge;
+        gaugeSlider.value    = CurrentGauge;
         gaugeSlider.maxValue = maxGauge;
     }
 

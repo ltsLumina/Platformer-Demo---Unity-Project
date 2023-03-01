@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+#region
 using UnityEditor;
-using UnityEngine;
 using static UnityEditor.EditorGUILayout;
-using static UnityEngine.GUILayout;
+#endregion
 
-[CustomEditor(typeof(Gauge))]
-public class GaugeEditor : Editor
+[CustomEditor(typeof(Gauge))] public class GaugeEditor : Editor
 {
     override public void OnInspectorGUI()
     {

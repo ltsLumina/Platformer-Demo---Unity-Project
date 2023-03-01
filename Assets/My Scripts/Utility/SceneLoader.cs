@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+#region
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+#endregion
 
 public class SceneLoader : MonoBehaviour
 {
@@ -16,24 +16,18 @@ public class SceneLoader : MonoBehaviour
     }
 
     /// <summary>
-    /// Loads the main menu screen (scene 0).
+    ///     Loads the main menu screen (scene 0).
     /// </summary>
-    public void LoadMainMenu()
-    {
-        SceneManager.LoadScene(0);
-    }
+    public void LoadMainMenu() { SceneManager.LoadScene(0); }
 
     /// <summary>
-    /// Loads a scene based on the scene number.
+    ///     Loads a scene based on the scene number.
     /// </summary>
     /// <param name="sceneNumber">The scene number to load.</param>
-    public void LoadGame(int sceneNumber, float delay)
-    {
-        SceneManager.LoadScene(sceneNumber);
-    }
+    public void LoadGame(int sceneNumber, float delay) { SceneManager.LoadScene(sceneNumber); }
 
     /// <summary>
-    /// Loads the end screen.
+    ///     Loads the end screen.
     /// </summary>
     /// <param name="delay">The delay before loading the scene.</param>
     public async void LoadGameOver(float delay)
@@ -45,15 +39,12 @@ public class SceneLoader : MonoBehaviour
     }
 
     /// <summary>
-    /// Reloads the current scene after a delay.
+    ///     Reloads the current scene after a delay.
     /// </summary>
-    public void ReloadScene(float delay)
-    {
-        LoadGame(SceneManager.GetActiveScene().buildIndex, delay);
-    }
+    public void ReloadScene(float delay) { LoadGame(SceneManager.GetActiveScene().buildIndex, delay); }
 
     /// <summary>
-    /// Loads the quit screen.
+    ///     Loads the quit screen.
     /// </summary>
     public void QuitGame()
     {
