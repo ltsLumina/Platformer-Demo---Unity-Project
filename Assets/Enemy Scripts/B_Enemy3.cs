@@ -51,7 +51,7 @@ public class B_Enemy3 : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D trig)
     {
-        if (trig.gameObject.tag == "Player")
+        if (trig.gameObject.CompareTag("Player"))
         {
             target  = trig.transform;
             inRange = true;
@@ -114,8 +114,7 @@ public class B_Enemy3 : MonoBehaviour
         float distanceToLeft  = Vector2.Distance(transform.position, leftLimit.position);
         float distanceToRight = Vector2.Distance(transform.position, rightLimit.position);
 
-        if (distanceToLeft > distanceToRight) target = leftLimit;
-        else target                                  = rightLimit;
+        target = distanceToLeft > distanceToRight ? leftLimit : rightLimit;
 
         Flip();
     }

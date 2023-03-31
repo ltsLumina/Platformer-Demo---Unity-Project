@@ -10,6 +10,18 @@ public class FollowPlayer : MonoBehaviour
     [SerializeField] float smoothing = 0.4f;
     [SerializeField] float yOffset, xOffset;
 
+    public float YOffset
+    {
+        get => yOffset;
+        set => yOffset = value;
+    }
+
+    public float XOffset
+    {
+        get => xOffset;
+        set => xOffset = value;
+    }
+
     [SerializeField] float shakeIntensity;
 
     public float ShakeIntensity
@@ -22,6 +34,12 @@ public class FollowPlayer : MonoBehaviour
     Vector3 velocity = Vector3.zero;
     Vector3 targetPosition;
     Transform targetToFollow;
+    Rigidbody2D playerRB;
+
+    void Awake()
+    {
+        playerRB = FindObjectOfType<PlayerMovement>().GetComponent<Rigidbody2D>();
+    }
 
     void Start()
     {

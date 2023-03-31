@@ -1,4 +1,5 @@
 #region
+using System;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
@@ -24,7 +25,11 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         myCamera = FindObjectOfType<Camera>();
-        player   = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+
+        if (player != null)
+        {
+            player = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+        }
     }
 
     void Start()
@@ -75,10 +80,5 @@ public class GameManager : MonoBehaviour
         SceneData = data;
 
         //Update the camera and tilemap color according to the new data.
-        myCamera.orthographicSize         = data.camSize;
-        myCamera.backgroundColor          = data.backgroundColor;
-        levels[currentTilemapIndex].color = data.foregroundColor;
-
-        currentForegroundColor = data.foregroundColor;
     }
 }

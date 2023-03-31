@@ -19,7 +19,6 @@ public class Pickup : MonoBehaviour
     [SerializeField] float addedTime;
     [Space(5)]
     [SerializeField] bool addPoints;
-    [SerializeField] float points;
 
     [Header("Cached References")]
     CountdownTimer timer;
@@ -53,7 +52,7 @@ public class Pickup : MonoBehaviour
                 break;
 
             case true when addPoints:
-                points++;
+                FindObjectOfType<Gauge>().CurrentGauge += 10;
                 Destroy(gameObject);
                 break;
         }

@@ -43,6 +43,8 @@ public class PlayerMovement : MonoBehaviour
         #region ANIMATION
         //if (RB.velocity.x == 0) tomteAnimator.Play("idle");
 
+        //tomteAnimator.SetBool("idle", isGrounded); TODO: doesnt work
+
         if (RB.velocity.x != 0)
         {
             tomteAnimator.SetBool(IsRunning, RB.velocity.x is > 3 or < -3);
@@ -54,15 +56,30 @@ public class PlayerMovement : MonoBehaviour
             tomteAnimator.speed = 1;
         }
 
-        if (RB.velocity.y > 0)
+        if (RB.velocity.y == 0)
         {
             tomteAnimator.SetBool("isFalling", false);
-            tomteAnimator.SetBool("isJumping", true);
+            //tomteAnimator.SetBool("isJumping", false);
         }
-        else if (RB.velocity.y < 0)
+
+        if (RB.velocity.y > 1)
         {
-            tomteAnimator.SetBool("isJumping", false);
+            tomteAnimator.SetBool("isFalling", false);
+            tomteAnimator.SetTrigger("isJumping");
+        }
+        if (RB.velocity.y < -1)
+        {
+            //tomteAnimator.SetBool("isJumping", false);
             tomteAnimator.SetBool("isFalling", true);
+        }
+
+        if (RB.velocity.x != 0 && IsJumping && tomteAnimator.GetBool("isRunJumping") == false)
+        {
+            tomteAnimator.SetBool("isRunJumping", true);
+        }
+        else
+        {
+            tomteAnimator.SetBool("isRunJumping", false);
         }
         #endregion
 
@@ -73,6 +90,8 @@ public class PlayerMovement : MonoBehaviour
         if (Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer) &&
             !IsJumping) //checks if set box overlaps with ground
             RB.velocity = new Vector2(RB.velocity.x, 0);
+
+        // if (isGrounded) RB.velocity = new Vector2(RB.velocity.x, 0)
         #endregion
 
         #region TIMERS
@@ -111,7 +130,7 @@ public class PlayerMovement : MonoBehaviour
                 LastOnGroundTime = Data.coyoteTime; //if so sets the lastGrounded to coyoteTime
             }
 
-            isGrounded = Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer);
+            isGrounded = Physics2D.OverlapBox(_groundCheckPoint.position, _groundCheckSize, 0, _groundLayer) && !IsJumping;
 
             //Right Wall Check
             if ((Physics2D.OverlapBox(_frontWallCheckPoint.position, _wallCheckSize, 0, _groundLayer) && IsFacingRight
@@ -197,11 +216,17 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region SLIDE CHECKS
-        // if (CanSlide() &&
-        //     (LastOnWallLeftTime > 0 && _moveInput.x < 0 || LastOnWallRightTime > 0 && _moveInput.x > 0))
-        //     IsSliding = true;
-        // else
-        //     IsSliding = false;
+        if (CanSlide() &&
+            (LastOnWallLeftTime > 0 && _moveInput.x < 0 || LastOnWallRightTime > 0 && _moveInput.x > 0))
+        {
+            IsSliding = true;
+            tomteAnimator.SetBool("isSliding", true);
+        }
+        else
+        {
+            IsSliding = false;
+            tomteAnimator.SetBool("isSliding", false);
+        }
         #endregion
 
         #region GRAVITY
@@ -363,6 +388,7 @@ public class PlayerMovement : MonoBehaviour
             _isJumpCut = true;
     }
 
+    public bool CanSlide() => LastOnWallTime > 0 && !IsJumping && !IsWallJumping && !IsDashing && LastOnGroundTime <= 0;
     public void OnDashInput() { LastPressedDashTime = Data.dashInputBufferTime; }
     #endregion
 
@@ -624,6 +650,5 @@ public class PlayerMovement : MonoBehaviour
         return _dashesLeft > 0;
     }
 
-    //public bool CanSlide() => LastOnWallTime > 0 && !IsJumping && !IsWallJumping && !IsDashing && LastOnGroundTime <= 0;
     #endregion
 }

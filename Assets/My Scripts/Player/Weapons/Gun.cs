@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Collections;
 using UnityEngine;
 using static UnityEngine.Debug;
 using static UnityEngine.Input;
@@ -38,21 +39,25 @@ public class Gun : MonoBehaviour
     [SerializeField] float pelletFireVel; // How fast the pellet is fired.
     [SerializeField] float shotgunDelay;  // How long it takes to shoot the SHOTGUN again.
 
+    [ReadOnly] bool bool123;
+
     [Header("Knockback Related Parameters")] [Tooltip("These are the parameters for knockback.")] [SerializeField]
     float knockbackForce; // How much knockback the pellet does.
     [SerializeField]
     bool dealKnockback; // [Serialized for debugging purposes] Whether or not the shotgun deals knockback.
     [SerializeField] float knockbackDuration;
-    [SerializeField] [Range(0, 50)]
-    float movingKbOffset; // How much knockback the pellet does when the player is moving.
-    [SerializeField] [Range(0, 50)]
-    float stationaryKbOffset; // How much knockback the pellet does when the player is stationary.
-    [SerializeField] [Range(0, 50)]
-    float airborneKbOffset; // How much knockback the pellet does when the player is airborne.
+    [SerializeField] [Range(0, 50)] float movingKbOffset; // How much knockback the pellet does when the player is moving.
+    [SerializeField] [Range(0, 50)] float stationaryKbOffset; // How much knockback the pellet does when the player is stationary.
+    [SerializeField] [Range(0, 50)] float airborneKbOffset; // How much knockback the pellet does when the player is airborne.
 
     [Header("Debugging")] [Tooltip("This is only for debugging, do not touch.")]
     [SerializeField] bool debug;
     [SerializeField] float shootElapsedTime; // [serialized for debugging purposes] The elapsed time since the last shot.
+
+    [Header("Audio")]
+    [SerializeField] AudioClip shotgunSound;
+    [SerializeField] AudioClip semiSound;
+    [SerializeField] AudioClip music;
 
     GameObject iBullet;    // The instantiated bullet.
     Rigidbody2D iBulletRb; // The instantiated bullet's Rigidbody2D.
@@ -82,6 +87,9 @@ public class Gun : MonoBehaviour
     /// </summary>
     void Awake()
     {
+        // start the music
+        AudioSource.PlayClipAtPoint(music, Vector3.zero);
+
         // Reference to the player's rigidbody.
         playerRb = GetComponentInParent<Rigidbody2D>();
         player   = GetComponentInParent<PlayerMovement>();
@@ -95,14 +103,23 @@ public class Gun : MonoBehaviour
         for (int i = 0; i < pelletCount; i++) { pellets.Add(Quaternion.Euler(Vector3.zero)); }
     }
 
+    void Start()
+    {
+        if (debug)
+        {
+            foreach (var sawblade in FindObjectsOfType<Sawblade>())
+            {
+                sawblade.GetComponent<Collider2D>().enabled = false;
+            }
+        }
+    }
+
     /// <summary>
     ///     Update handles the shooting of the gun, switching the fire mode, and updating the text on screen that displays said
     ///     text as well as the elapsed time before the next shot.
     /// </summary>
     void Update()
     {
-        TEMP_inf_Gauge(); //TODO: DEBUGGING, REMOVE LATER
-
         // Update the elapsed time each frame to determine when to shoot again.
         shootElapsedTime += Time.deltaTime;
 
@@ -149,7 +166,9 @@ public class Gun : MonoBehaviour
         switch (fireMode)
         {
             case FireMode.Semi:
+                GetComponent<AudioSource>().PlayOneShot(semiSound);
                 // Reset the elapsed time, reset the knockback, and reset the rotation of the gun.
+                shootElapsedTime = 0;
                 dealKnockback = false;
                 gameObject.transform.localEulerAngles = new Vector3(0, 0, 0);
 
@@ -161,6 +180,7 @@ public class Gun : MonoBehaviour
                         0, 0, iBullet.transform.eulerAngles.z + Random.Range(-bulletSpread, bulletSpread));
 
                 iBulletRb = iBullet.GetComponent<Rigidbody2D>();
+                // play semi shoot sound
                 ApplyProjForce(CurrentFireMode, fireDir);
 
                 break;
@@ -168,6 +188,7 @@ public class Gun : MonoBehaviour
             case FireMode.Shotgun when gauge.CurrentGauge >= 10:
                 for (int i = 0; i < pelletCount; i++)
                 {
+                    GetComponent<AudioSource>().PlayOneShot(shotgunSound);
                     // Reset the elapsed time, instantiate the pellet and save its rigidbody as a reference.
                     // Then apply the spread angle to the gun gameobject.
                     shootElapsedTime                      = -shotgunDelay;
@@ -185,20 +206,9 @@ public class Gun : MonoBehaviour
                     ApplyProjForce(CurrentFireMode, fireDir);
                 }
 
-                switch (debug)
-                {
-                    case true:
-                        gauge.CurrentGauge += 100;
-                        dealKnockback      =  true;
-                        ApplyKnockback(fireDir);
-                        break;
-
-                    default:
-                        gauge.CurrentGauge -= 10;
-                        dealKnockback      =  true;
-                        ApplyKnockback(fireDir);
-                        break;
-                }
+                gauge.CurrentGauge -= 10;
+                dealKnockback      =  true;
+                ApplyKnockback(fireDir);
 
                 break;
 
@@ -272,24 +282,20 @@ public class Gun : MonoBehaviour
                     tomteAnimator.SetTrigger("isKB");
                     StartCoroutine(ApplyKnockbackForce(transform.right, airborneKbOffset));
                 }
-
-                if (debug) LogWarning("Player is airborne");
                 break;
 
             // knockback if player is standing still
             case true when playerRb.velocity is { y: 0 }:
                 if (fireDir == Vector2.right)
                 {
-                    //tomteAnimator.SetTrigger(IsKb);
+                    tomteAnimator.SetTrigger(IsKb);
                     StartCoroutine(ApplyKnockbackForce(-transform.right, stationaryKbOffset));
                 }
                 else if (fireDir == Vector2.left)
                 {
-                    //tomteAnimator.SetTrigger(IsKb);
+                    tomteAnimator.SetTrigger(IsKb);
                     StartCoroutine(ApplyKnockbackForce(transform.right, stationaryKbOffset));
                 }
-
-                if (debug) LogWarning("Player is grounded");
                 break;
 
             case false and false: // Alternatively: case false when dealKnockback == false:
@@ -322,10 +328,5 @@ public class Gun : MonoBehaviour
         playerRb.constraints = RigidbodyConstraints2D.None;
         playerRb.constraints = RigidbodyConstraints2D.FreezeRotation;
         playerRb.rotation    = 0;
-    }
-
-    void TEMP_inf_Gauge()
-    {
-        if (debug) gauge.CurrentGauge = 100;
     }
 }

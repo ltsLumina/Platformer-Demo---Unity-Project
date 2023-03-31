@@ -3,7 +3,8 @@ using UnityEditor;
 using static UnityEngine.GUILayout;
 #endregion
 
-[CustomEditor(typeof(Misc_DebugTools))] public class Misc_DebugToolsEditor : Editor
+[CustomEditor(typeof(Misc_DebugTools))]
+public class Misc_DebugToolsEditor : Editor
 {
     override public void OnInspectorGUI()
     {

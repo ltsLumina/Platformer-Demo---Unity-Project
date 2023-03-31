@@ -12,24 +12,27 @@ public class Pointer : MonoBehaviour
     [SerializeField] float smoothing = 0.4f;
     [SerializeField] float enableAfterTime = 2.5f;
 
-    [Header("Animator"), Space(5)]
-    [SerializeField] Animator tomteAnimator;
-
     //Private variables
     Vector3 velocity = Vector3.zero;
     Vector3 targetPosition;
     Transform playerPos;
     Rigidbody2D playerRB;
+    SceneLoader sceneLoader;
+    SpriteRenderer spriteRenderer;
 
     float timer;
+    bool testBool;
 
     void Start()
     {
         playerPos = GameObject.FindWithTag("Player").transform;
         playerRB  = FindObjectOfType<PlayerMovement>().RB;
+        sceneLoader = FindObjectOfType<SceneLoader>();
 
         transform.position = new Vector3(playerPos.position.x, playerPos.position.y + offset.y, transform.position.z);
-        //GetComponentInChildren<SpriteRenderer>().enabled = false;
+        GetComponentInChildren<SpriteRenderer>().enabled = false;
+
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     void LateUpdate() => FollowPlayer();
@@ -56,16 +59,6 @@ public class Pointer : MonoBehaviour
         if (playerRB.velocity.x == 0) timer += Time.deltaTime;
         else timer -= Time.deltaTime;
 
-        //GetComponentInChildren<SpriteRenderer>().enabled = timer >= timeToCountTo;
-
-        if (timer >= timeToCountTo)
-        {
-            tomteAnimator.SetBool("isIdle", true);
-        }
-        else
-        {
-            tomteAnimator.SetBool("isIdle", false);
-        }
-        //TODO: ^^ this works, just need to add the SetTrigger functions.
+        GetComponentInChildren<SpriteRenderer>().enabled = timer >= timeToCountTo;
     }
 }
